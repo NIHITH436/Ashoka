@@ -1,13 +1,20 @@
 const { Low } = require('lowdb');
 const { JSONFile } = require('lowdb/node');
 const path = require('path');
+const fs = require('fs');
 
-const adapter = new JSONFile(path.join(__dirname, '../data/ashoka_db.json'));
-const db = new Low(adapter, {
-  users: [],
-  shlokas: [],
-  chats: []
-});
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+const dbPath = path.join(dataDir, 'ashoka_db.json');
+if (!fs.existsSync(dbPath)) {
+  fs.writeFileSync(dbPath, JSON.stringify({ users: [], shlokas: [], chats: [] }));
+}
+
+const adapter = new JSONFile(dbPath);
+const db = new Low(adapter, { users: [], shlokas: [], chats: [] });
 
 const initDB = async () => {
   await db.read();
